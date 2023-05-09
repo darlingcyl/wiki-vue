@@ -122,6 +122,7 @@
   import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
   import axios from 'axios';
   import {onMounted} from 'vue'
+  import {StarOutlined, LikeOutlined, MessageOutlined} from '@ant-design/icons-vue';
 
   const listData:Record<string,string>[] = [];
   for (let i = 0; i < 23; i++) {
@@ -137,6 +138,11 @@
   }
   export default defineComponent({
     name: 'Home',
+    components:{
+      StarOutlined,
+      LikeOutlined,
+      MessageOutlined
+    },
     // components: {
     //   HelloWorld,
     // },
@@ -146,11 +152,16 @@
       onMounted(()=>{
         // console.log("onMounted");
         //用axios发送请求到服务器
-        axios.get("http://localhost:8880/ebook/getEbook?name=spring").then((response)=>{
+        axios.get("/ebook/getEbook?name=spring",{
+          params: {
+            page: 1,
+            size: 1000
+          }
+        }).then((response)=>{
           //响应体
           // console.log(response);
           const data = response.data;
-          ebooks.value = data.content
+          ebooks.value = data.content.list;
         });
       });
       const pagination = {

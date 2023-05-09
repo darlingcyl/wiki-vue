@@ -5,7 +5,7 @@
                 :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
         >
     <!--<div class="about">-->
-        <!--<h1>管理电子书页面</h1>-->
+        <!--<h1>管理文档页面</h1>-->
     <!--</div>-->
             <p>
                 <!--<a-button type="primary" @click="add()">-->
@@ -17,8 +17,8 @@
                         </a-input>
                     </a-form-item>
                     <a-form-item>
-                        <a-button type="primary" @click="handleQuery({page: 1, size: pagination.pageSize})">
-                            查询
+                        <a-button type="primary" @click="handleQuery()">
+                            刷新
                         </a-button>
                     </a-form-item>
                     <a-form-item>
@@ -32,7 +32,7 @@
             <a-table
                     :columns="columns"
                     :row-key="'record => record.id'"
-                    :data-source="ebooks"
+                    :data-source="docs"
                     :pagination="pagination"
                     :loading="loading"
                     @change="handleTableChange"
@@ -48,8 +48,7 @@
 
                 <template v-slot:action="{ text, record }">
                     <a-space size="small">
-                        <router-link :to="'/admin/doc?ebookId=' + record.id">
-                        <!--<router-link :to="'/admin/doc'">-->
+                        <router-link :to="'/admin/doc?docId=' + record.id">
                             <a-button type="primary">
                                 文档管理
                             </a-button>
@@ -79,12 +78,12 @@
                         :confirm-loading="modalLoading"
                         @ok="handleModalOk"
                 >
-                    <a-form :model="ebook" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
+                    <a-form :model="doc" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
                         <a-form-item label="封面">
-                            <a-input v-model:value="ebook.cover" />
+                            <a-input v-model:value="doc.cover" />
                         </a-form-item>
                         <a-form-item label="名称">
-                            <a-input v-model:value="ebook.name" />
+                            <a-input v-model:value="doc.name" />
                         </a-form-item>
                         <a-form-item label="分类">
                             <a-cascader
@@ -94,7 +93,7 @@
                             />
                         </a-form-item>
                         <a-form-item label="描述">
-                            <a-input v-model:value="ebook.description" type="textarea" />
+                            <a-input v-model:value="doc.description" type="textarea" />
                         </a-form-item>
                     </a-form>
                     <!--<p>展示编辑区域</p>-->
@@ -109,12 +108,14 @@
     import axios from 'axios';
     import {message} from "ant-design-vue";
     import {Tool} from "@/util/tool";
+    import {useRoute} from "vue-router";
     export default defineComponent({
-        name: 'AdminEbook',
+        name: 'AdminDoc',
         setup() {
+            const route = useRoute();
             const param=ref();
             param.value={};
-            const ebooks = ref();
+            const docs = ref();
             const pagination = ref({
                 current: 1,
                 pageSize: 10,
@@ -164,7 +165,7 @@
              **/
             const handleQuery = (params: any) => {
                 loading.value = true;
-                axios.get("/ebook/getEbook",{
+                axios.get("/doc/getDoc",{
                     params:{
                         page: params.page,
                         size: params.size,
@@ -173,7 +174,7 @@
                 }).then((response) => {
                     loading.value = false;
                     const data = response.data;
-                    ebooks.value = data.content.list;
+                    docs.value = data.content.list;
 
                     // 重置分页按钮
                     pagination.value.current = params.page;
@@ -183,7 +184,7 @@
 
             // const handleQuery = (params: any) => {
             //     loading.value = true;
-            //     axios.get("http://localhost:8880/ebook/getEbook", {
+            //     axios.get("http://localhost:8880/doc/getDoc", {
             //         params:{
             //             page: params.page,
             //             size: params.size,
@@ -193,9 +194,9 @@
             //         loading.value = false;
             //         const data = response.data;
             //         if (data.success){
-            //             ebook.value = data.content.list;
-            //             // ebook.value = {cover: "11",name: "223"},{cover: "2",name: "5"};
-            //             console.log("shuju"+ebook.value);
+            //             doc.value = data.content.list;
+            //             // doc.value = {cover: "11",name: "223"},{cover: "2",name: "5"};
+            //             console.log("shuju"+doc.value);
             //             // 重置分页按钮
             //             pagination.value.current = params.page;
             //             pagination.value.total = data.content.total;
@@ -219,12 +220,12 @@
             };
 
             // -------- 表单 ---------
-            const ebook = ref({});
+            const doc = ref({});
             const modalVisible = ref(false);
             const modalLoading = ref(false);
             const handleModalOk = () => {
                 modalLoading.value = true;
-                axios.post("/ebook/save", ebook.value).then((response) => {
+                axios.post("/doc/save", doc.value).then((response) => {
                     modalLoading.value = false;
                     const data = response.data; // data = commonResp
                     if (data.success) {
@@ -249,8 +250,8 @@
              */
             const edit = (record: any) => {
                 modalVisible.value = true;
-                //ebook.value=record
-                ebook.value=Tool.copy(record);
+                //doc.value=record
+                doc.value=Tool.copy(record);
             };
 
             /**
@@ -258,12 +259,14 @@
              */
             const add = () => {
                 modalVisible.value = true;
-                ebook.value = {};
+                doc.value = {
+                    ebookId : route.query.ebookId
+                };
             };
 
             /**删除 */
             const handleDelete = (id: number) => {
-                axios.delete("/ebook/delete/" + id).then((response) => {
+                axios.delete("/doc/delete/" + id).then((response) => {
                     const data = response.data; // data = commonResp
                     if (data.success) {
                         // 重新加载列表
@@ -284,7 +287,7 @@
                 });
             });
             return {
-                ebooks,
+                docs,
                 pagination,
                 columns,
                 loading,
@@ -295,7 +298,7 @@
                 edit,
                 add,
                 handleDelete,
-                ebook,
+                doc,
                 modalLoading,
                 modalVisible,
                 handleModalOk,
