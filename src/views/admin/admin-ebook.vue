@@ -133,13 +133,8 @@
                     dataIndex: 'name'
                 },
                 {
-                    title: '分类一',
-                    Key:'category1Id',
-                    dataIndex:'category1Id'
-                },
-                {
-                    title: '分类二',
-                    dataIndex:'category2Id'
+                    title: '分类',
+                    slots: {customRender: 'category'}
                 },
                 {
                     title: '文档数',
@@ -164,6 +159,7 @@
              **/
             const handleQuery = (params: any) => {
                 loading.value = true;
+                ebooks.value = [];
                 axios.get("/ebook/getEbook",{
                     params:{
                         page: params.page,
@@ -219,11 +215,14 @@
             };
 
             // -------- 表单 ---------
-            const ebook = ref({});
+            const categoryIds = ref();
+            const ebook = ref();
             const modalVisible = ref(false);
             const modalLoading = ref(false);
             const handleModalOk = () => {
                 modalLoading.value = true;
+                ebook.value.category1Id=categoryIds.value[0];
+                ebook.value.category2Id=categoryIds.value[1];
                 axios.post("/ebook/save", ebook.value).then((response) => {
                     modalLoading.value = false;
                     const data = response.data; // data = commonResp
@@ -251,6 +250,7 @@
                 modalVisible.value = true;
                 //ebook.value=record
                 ebook.value=Tool.copy(record);
+                categoryIds.value = [ebook.value.category1Id,ebook.value.category2Id];
             };
 
             /**
@@ -275,13 +275,50 @@
                 });
             };
 
-            onMounted(() => {
-                handleQuery({
-                    page: pagination.value.current,
-                    size: pagination.value.pageSize
-                    // page: 1,
-                    // size: pagination.value.pageSize
+            const level1 = ref();
+            let categorys: any;
+            /**
+             * 查询所有分类
+             **/
+            const handleQueryCategory = () => {
+                loading.value = true;
+                axios.get("/category/all").then((response) => {
+                    loading.value = false;
+                    const data = response.data;
+                    if (data.success) {
+                        categorys = data.content;
+                        console.log("原始数组：", categorys);
+
+                        level1.value = [];
+                        level1.value = Tool.array2Tree(categorys, 0);
+                        console.log("树形结构：", level1.value);
+                        // 加载完分类后，再加载电子书，否则会报forEach undefined的错误
+                        // 列表渲染的时候，如果还没取到分类数据就会报错；
+                        handleQuery({
+                            page: 1,
+                            size: pagination.value.pageSize,
+                        });
+                    } else {
+                        message.error(data.message);
+                    }
                 });
+            };
+
+            const getCategoryName = (cid: number) => {
+                let result = "";
+                categorys.forEach((item: any) => {
+                    if(item!=null){
+                        if (item.id === cid) {
+                            // return item.name; // 注意，这里直接return不起作用
+                            result = item.name;
+                        }
+                    }
+                });
+                return result;
+            };
+
+            onMounted(() => {
+                handleQueryCategory();
             });
             return {
                 ebooks,
@@ -299,6 +336,9 @@
                 modalLoading,
                 modalVisible,
                 handleModalOk,
+                categoryIds,
+                level1,
+                getCategoryName
             }
         }
     });
