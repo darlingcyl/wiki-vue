@@ -42,12 +42,6 @@
 
                         <template v-slot:action="{ text, record }">
                             <a-space size="small">
-                                <router-link :to="'/admin/doc?docId=' + record.id">
-                                    <!--<router-link :to="'/admin/doc'">-->
-                                    <a-button type="primary">
-                                        文档管理
-                                    </a-button>
-                                </router-link>
                                 <a-button type="primary" @click="edit(record)" size="small">
                                     编辑
                                 </a-button>

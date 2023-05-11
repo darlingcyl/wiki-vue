@@ -255,3 +255,14 @@
     }
   });
 </script>
+
+<!--显示图标新增的一段样式，scoped代表只在本页面生效（防止样式污染）-->
+<style scoped>
+  .ant-avatar {
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    border-radius: 8%;
+    margin: 5px 0;
+  }
+</style>
