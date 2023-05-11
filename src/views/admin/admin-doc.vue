@@ -34,9 +34,8 @@
                             :defaultExpandAllRows="true"
 
                     >
-                    <!--@change="handleTableChange"-->
                         <template #name="{ text: record }">
-                            {{record.sort}} {{text}}
+                            {{text}}
                         </template>
 
 
@@ -73,7 +72,7 @@
                         <a-form-item>
                             <a-input v-model:value="doc.name" placeholder="名字"/>
                         </a-form-item>
-                        <a-form-item label="父文档">
+                        <a-form-item>
                             <a-tree-select
                                     v-model:value="doc.parent"
                                     style="width: 100%"
