@@ -16,7 +16,7 @@
         </a-menu-item>
         <a-sub-menu v-for="item in level1" :key="item.id" >
           <template v-slot:title>
-            <span><user-outlined />{{item.name}}</span>
+            <span><UserOutlined />{{item.name}}</span>
           </template>
           <a-menu-item v-for="child in item.children" :key="child.id">
             <MailOutlined /><span>{{child.name}}</span>
@@ -146,6 +146,8 @@
   import {StarOutlined, LikeOutlined, MessageOutlined} from '@ant-design/icons-vue';
   import {message} from 'ant-design-vue';
   import {Tool} from "@/util/tool";
+  import UserOutlined from "@ant-design/icons-vue/UserOutlined";
+  import MailOutlined from "@ant-design/icons-vue/MailOutlined";
 
   const listData:Record<string,string>[] = [];
   for (let i = 0; i < 23; i++) {
@@ -164,7 +166,9 @@
     components:{
       StarOutlined,
       LikeOutlined,
-      MessageOutlined
+      MessageOutlined,
+      UserOutlined,
+      MailOutlined
     },
     // components: {
     //   HelloWorld,
