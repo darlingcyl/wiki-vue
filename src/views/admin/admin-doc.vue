@@ -34,8 +34,8 @@
                             :defaultExpandAllRows="true"
 
                     >
-                        <template #name="{ text: record }">
-                            {{text}}
+                        <template name="{text: record}">
+                            {{record.sort}} {{text}}
                         </template>
 
 
@@ -147,17 +147,8 @@
                 {
                     title: '名称',
                     dataIndex: 'name',
-                    slots: {customRender: 'name'}
+                    slots: { customRender: 'name'}
                 },
-                // {
-                //     title: '父文档',
-                //     Key:'parent',
-                //     dataIndex:'parent'
-                // },
-                // {
-                //     title: '排序',
-                //     dataIndex:'sort'
-                // },
                 {
                     title: '操作',
                     key: 'action',
@@ -217,7 +208,7 @@
             const createEditor = ()=>{
                 editor = new E('#content');
                 editor.create();
-                editor.config.zIndex=0;//编辑时下拉不被遮挡住，修改他显示层级级别
+                editor.config.zIndex=-1;//编辑时下拉不被遮挡住，修改他显示层级级别
             }
             // const editor = new E('#content');
 
